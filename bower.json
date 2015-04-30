@@ -1,0 +1,30 @@
+{
+  "name": "audioFX",
+  "version": "0.0.0",
+  "description": "High-Level Audio Effects using the Web Audio API in JavaScript.",
+  "homepage": "https://github.com/madebywild/audioFX",
+  "authors": [
+    "Thomas Strobl <thomas@thomas-strobl.com>"
+  ],
+  "main": "dist/audioFX.js",
+  "moduleType": [
+    "es6",
+    "globals"
+  ],
+  "keywords": [
+    "audio",
+    "webaudio",
+    "filter",
+    "audioapi",
+    "web-audio-api",
+    "web-audio"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

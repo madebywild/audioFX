@@ -1,0 +1,34 @@
+{
+  "name": "audiofx",
+  "version": "0.0.0",
+  "description": "High-Level Audio Effects using the Web Audio API in JavaScript.",
+  "main": "dist/audioFX.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/madebywild/audioFX.git"
+  },
+  "keywords": [
+    "audio",
+    "api",
+    "web",
+    "web-audio-api",
+    "web",
+    "audio",
+    "filter",
+    "filtering"
+  ],
+  "author": "Thomas Strobl <thomas@thomas-strobl.com> (http://thomas-strobl.com/)",
+  "license": "MIT+",
+  "bugs": {
+    "url": "https://github.com/madebywild/audioFX/issues"
+  },
+  "homepage": "https://github.com/madebywild/audioFX#readme",
+  "devDependencies": {
+    "gulp-babel": "^5.1.0",
+    "gulp-concat": "^2.5.2",
+    "gulp-sourcemaps": "^1.5.2"
+  }
+}
