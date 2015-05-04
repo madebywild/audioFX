@@ -13,18 +13,94 @@ Waiting for approval.
 
 ### Bower
 
-``bower install AudioFX``
+``bower install AudioFX`` [![Bower version](https://badge.fury.io/bo/AudioFX.svg)](http://badge.fury.io/bo/AudioFX)
 
 ### NPM
 
-``npm install audiofx``
+``npm install audiofx`` [![npm version](https://badge.fury.io/js/audiofx.svg)](http://badge.fury.io/js/audiofx)
 
-## Instructions
+## Usage Instructions
 
-Should be called after the window has loaded to ensure we have access to the Audio Context of the Browser.
+*Note:* **AudioFX** should be called after the window has loaded to ensure we have access to the Audio Context of the Browser.
+
+#### new AudioFX(url, [callback], [options])
+
+Creates a new AudioFX instance that represents one loaded Audio file. If you store it in a variable for later use, make sure to ``null`` the variable so it's fully eligible to garbage collection.
+ 
+``url`` {string} - A URL where to load the file from.
+``callback`` {function} - A function that gets called once the buffer has been loaded and we are ready for playback. *optional*
+``options`` {object} - Custom options on instance level. *optional*
 
 Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    // do something
+}, {
+    loop: true
+});
+```
 
+#### play
+
+Plays the ``AudioFX`` instance from the beginning and re-evaluates the options of the instance before playing (in case they were changed in the meantime).
+You can only play an instance once its file has been loaded, so its the best to use inside the constructor callback function.
+
+Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    this.play();
+});
+```
+
+### stop
+
+Stops the ``AudioFX`` instance immediately.
+
+Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    this.play();
+    setTimeout(function(){
+      TestAudio.stop();
+    },1000);
+});
+```
+
+#### toggle
+
+Toggles the play/stop state of the ``AudioFX`` instance.
+
+Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    document.addEventListener('mousedown', function(){
+      TestAudio.toggle();
+    });
+});
+```
+
+#### changeVolume
+
+``volume`` {number} - the new volume to set (supply a fraction like 0.5 between 0 and 1)
+
+You can also use ``volume()`` which is simply syntactic sugar for the ``changeVolume()`` function.
+
+Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    this.play();
+    TestAudio.changeFilter(f,q);
+}, {loop:true});
+```
+
+#### changeFilter
+
+``frequency`` {number} - the frequency of the filter (supply a fraction like 0.5 between 0 and 1)
+``quality`` {number} - the volume (supply a fraction like 0.5 between 0 and 1)
+
+You can also use ``filter()`` which is simply syntactic sugar for the ``changeFilter()`` function.
+
+Example:
 ```javascript
 var TestAudio = new AudioFX("test.mp3", function(){
     this.play();
@@ -33,10 +109,23 @@ var TestAudio = new AudioFX("test.mp3", function(){
       var q = e.pageY / window.innerHeight;
       TestAudio.changeFilter(f,q);
     });
-    document.addEventListener('mousedown', function(){
-      TestAudio.toggle();
-    });
 }, {loop:true});
+```
+
+#### destroy
+
+Stops and destroys the ``AudioFX`` instance, be sure to ``null`` the variable/references to completely get rid of it in the memory.
+
+You can also use ``remove()`` and ``kill()`` which is simply syntactic sugar for the ``destroy()`` function.
+
+Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    this.play();
+    setTimeout(function(){
+      TestAudio.destroy();
+    },1000);
+});
 ```
 
 ## Dependencies
@@ -54,12 +143,12 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 - Safari 6
 - **No Internet Explorer!**
 
-## Todo / Roadmap
+## Roadmap
 
-- [ ] Proper Docs
 - [ ] Proper Tests, obviously
 - [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 - [ ] autoplay option
+- [ ] all Filter types (highpass etc.)
 - [ ] Global Volume Change across all audioFX instances
 - [ ] Fade In / Fade Out (non-linear)
 - [ ] Reverb (Convolver)

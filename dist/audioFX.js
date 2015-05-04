@@ -21,8 +21,8 @@ var AudioFX = (function () {
    * Instantiates a new AudioFX instance, should be called after the window has loaded.
    * @constructor
    * @param {string} url - A URL where to load the file from.
-   * @param {object} options - Custom options on instance level.
    * @param {function} callback - A function that gets called once the buffer has been loaded and we are ready for playback.
+   * @param {object} options - Custom options on instance level.
    */
 
   function AudioFX(url, callback, options) {
@@ -260,6 +260,7 @@ var AudioFX = (function () {
      * Destroys the instance, make sure to clean all reference to it for Garbage Collection
      */
     value: function destroy() {
+      this.stop();
       var self = this;
       self = null;
     }

@@ -7,8 +7,8 @@ class AudioFX {
    * Instantiates a new AudioFX instance, should be called after the window has loaded.
    * @constructor
    * @param {string} url - A URL where to load the file from.
-   * @param {object} options - Custom options on instance level.
    * @param {function} callback - A function that gets called once the buffer has been loaded and we are ready for playback.
+   * @param {object} options - Custom options on instance level.
    */
   constructor(url, callback, options) {
     // set constants
@@ -223,6 +223,7 @@ class AudioFX {
    * Destroys the instance, make sure to clean all reference to it for Garbage Collection
    */
   destroy(){
+    this.stop();
     let self = this;
     self = null;
   }
