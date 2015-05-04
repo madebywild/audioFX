@@ -6,7 +6,7 @@ High-Level Audio Effects using the Web Audio API in JavaScript, ~1-2 KB gzipped.
 
 ### CDN
 
-``<script src="//cdn.jsdelivr.net/mojs/latest/mo.min.js"></script>``
+``<script src="//cdn.jsdelivr.net/audioFX/latest/audioFX.min.js"></script>``
 
 ### Bower
 
