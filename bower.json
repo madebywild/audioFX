@@ -6,7 +6,7 @@
   "authors": [
     "Thomas Strobl <thomas@thomas-strobl.com>"
   ],
-  "main": "dist/audioFX.js",
+  "main": "dist/audioFX.min.js",
   "moduleType": [
     "es6",
     "globals"

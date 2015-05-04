@@ -2,7 +2,7 @@
   "name": "audiofx",
   "version": "0.0.0",
   "description": "High-Level Audio Effects using the Web Audio API in JavaScript.",
-  "main": "dist/audioFX.js",
+  "main": "dist/audioFX.min.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -27,8 +27,11 @@
   },
   "homepage": "https://github.com/madebywild/audioFX#readme",
   "devDependencies": {
+    "gulp": "^3.8.11",
     "gulp-babel": "^5.1.0",
     "gulp-concat": "^2.5.2",
-    "gulp-sourcemaps": "^1.5.2"
+    "gulp-rename": "^1.2.2",
+    "gulp-sourcemaps": "^1.5.2",
+    "gulp-uglify": "^1.2.0"
   }
 }
