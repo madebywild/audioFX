@@ -1,10 +1,10 @@
 "use strict";
 /*global window,AudioContext,XMLHttpRequest */
 
-class audioFX {
+class AudioFX {
 
   /**
-   * Instantiates a new audioFX instance, should be called after the window has loaded.
+   * Instantiates a new AudioFX instance, should be called after the window has loaded.
    * @constructor
    * @param {string} url - A URL where to load the file from.
    * @param {object} options - Custom options on instance level.
@@ -20,8 +20,8 @@ class audioFX {
       loop: false
     };
     // overwrite defaults with supplied options – if an object is supplied
-    if(audioFX.isObject(options)) {
-      this.options = audioFX.extend(defaultOptions, options);
+    if(AudioFX.isObject(options)) {
+      this.options = AudioFX.extend(defaultOptions, options);
     }
     // initialize the instance vars
     this.playing = false;
@@ -30,15 +30,15 @@ class audioFX {
       window.AudioContext = window.AudioContext||window.webkitAudioContext;
       this.context = new AudioContext();
     }catch(e) {
-      audioFX.error('Web Audio API is not supported in this browser');
+      AudioFX.error('Web Audio API is not supported in this browser');
     }
     // register the supplied url, I'd say there's no valid-URL-check necessary
     this.url = url;
     // if the callback is really a function, register it
-    if(audioFX.isFunction(callback)) {
+    if(AudioFX.isFunction(callback)) {
       this.onload = callback;
     }else{
-      audioFX.error("Supplied callback is not a function.");
+      AudioFX.error("Supplied callback is not a function.");
     }
     // register empty buffer var
     this.buffer = null;
@@ -99,7 +99,7 @@ class audioFX {
     };
     // bind error function in case things go wrong
     this.request.onerror = function() {
-      audioFX.error("XMLHttpRequest errored.");
+      AudioFX.error("XMLHttpRequest errored.");
     };
     // actually send the request we created
     this.request.send();
@@ -295,7 +295,7 @@ class audioFX {
    * @param {string} errorMessage - the message for output
    */
   static error(errorMessage){
-    return console.error('audioFX: Error! '+errorMessage);
+    return console.error('AudioFX: Error! '+errorMessage);
   }
 
 }

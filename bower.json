@@ -1,15 +1,17 @@
 {
-  "name": "audioFX",
-  "version": "0.0.0",
+  "name": "AudioFX",
+  "version": "0.0.1",
   "description": "High-Level Audio Effects using the Web Audio API in JavaScript.",
   "homepage": "https://github.com/madebywild/audioFX",
   "authors": [
     "Thomas Strobl <thomas@thomas-strobl.com>"
   ],
-  "main": "dist/audioFX.min.js",
+  "main": "dist/AudioFX.min.js",
   "moduleType": [
     "es6",
-    "globals"
+    "globals",
+    "amd",
+    "commonjs"
   ],
   "keywords": [
     "audio",
@@ -24,6 +26,7 @@
     "**/.*",
     "node_modules",
     "bower_components",
+    "examples",
     "test",
     "tests"
   ]

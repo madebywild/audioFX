@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AudioFX Example</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #7a7677;
+    }
+  </style>
+</head>
+<body>
+<script src="../dist/AudioFX.js"></script>
+<script>
+  var TestAudio = new AudioFX("test.mp3", function(){
+    this.play();
+    document.addEventListener('mousemove', function(e){
+      var f = e.pageX / window.innerWidth;
+      var q = e.pageY / window.innerHeight;
+      TestAudio.changeFilter(f,q);
+    });
+    document.addEventListener('mousedown', function(){
+      TestAudio.toggle();
+    });
+  }, {loop:true});
+</script>
+</body>
+</html>

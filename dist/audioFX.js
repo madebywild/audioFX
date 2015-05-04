@@ -15,18 +15,18 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 /*global window,AudioContext,XMLHttpRequest */
 
-var audioFX = (function () {
+var AudioFX = (function () {
 
   /**
-   * Instantiates a new audioFX instance, should be called after the window has loaded.
+   * Instantiates a new AudioFX instance, should be called after the window has loaded.
    * @constructor
    * @param {string} url - A URL where to load the file from.
    * @param {object} options - Custom options on instance level.
    * @param {function} callback - A function that gets called once the buffer has been loaded and we are ready for playback.
    */
 
-  function audioFX(url, callback, options) {
-    _classCallCheck(this, audioFX);
+  function AudioFX(url, callback, options) {
+    _classCallCheck(this, AudioFX);
 
     // set constants
     this["const"] = {
@@ -37,8 +37,8 @@ var audioFX = (function () {
       loop: false
     };
     // overwrite defaults with supplied options – if an object is supplied
-    if (audioFX.isObject(options)) {
-      this.options = audioFX.extend(defaultOptions, options);
+    if (AudioFX.isObject(options)) {
+      this.options = AudioFX.extend(defaultOptions, options);
     }
     // initialize the instance vars
     this.playing = false;
@@ -47,15 +47,15 @@ var audioFX = (function () {
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
       this.context = new AudioContext();
     } catch (e) {
-      audioFX.error("Web Audio API is not supported in this browser");
+      AudioFX.error("Web Audio API is not supported in this browser");
     }
     // register the supplied url, I'd say there's no valid-URL-check necessary
     this.url = url;
     // if the callback is really a function, register it
-    if (audioFX.isFunction(callback)) {
+    if (AudioFX.isFunction(callback)) {
       this.onload = callback;
     } else {
-      audioFX.error("Supplied callback is not a function.");
+      AudioFX.error("Supplied callback is not a function.");
     }
     // register empty buffer var
     this.buffer = null;
@@ -77,7 +77,7 @@ var audioFX = (function () {
     // no return needed for constructor
   }
 
-  _createClass(audioFX, [{
+  _createClass(AudioFX, [{
     key: "loadFile",
 
     /**
@@ -118,7 +118,7 @@ var audioFX = (function () {
       };
       // bind error function in case things go wrong
       this.request.onerror = function () {
-        audioFX.error("XMLHttpRequest errored.");
+        AudioFX.error("XMLHttpRequest errored.");
       };
       // actually send the request we created
       this.request.send();
@@ -348,11 +348,11 @@ var audioFX = (function () {
      * @param {string} errorMessage - the message for output
      */
     value: function error(errorMessage) {
-      return console.error("audioFX: Error! " + errorMessage);
+      return console.error("AudioFX: Error! " + errorMessage);
     }
   }]);
 
-  return audioFX;
+  return AudioFX;
 })();
 return AudioFX;
 }));
