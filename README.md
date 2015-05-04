@@ -1,4 +1,4 @@
-# audioFX
+# audioFX [![GitHub version](https://badge.fury.io/gh/madebywild%2FaudioFX.svg)](http://badge.fury.io/gh/madebywild%2FaudioFX)
 
 High-Level Audio Effects using the Web Audio API in JavaScript, ~1-2 KB gzipped.
 
