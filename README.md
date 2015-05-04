@@ -8,15 +8,16 @@ Currently only a lowpass-filter is available and things are very **alpha** as th
 
 ### CDN
 
-``<script src="//cdn.jsdelivr.net/audioFX/latest/audioFX.min.js"></script>``
+Waiting for approval.
+``<script src="//cdn.jsdelivr.net/audiofx/latest/audioFX.min.js"></script>``
 
 ### Bower
 
-``bower install audioFX``
+``bower install AudioFX``
 
 ### NPM
 
-``npm install audioFX``
+``npm install audiofx``
 
 ## Instructions
 
