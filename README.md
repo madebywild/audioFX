@@ -44,7 +44,7 @@ var TestAudio = new AudioFX("test.mp3", function(){
 
 ## Compatibility
 
-It uses ``UMD`` and therefore is compatible with ``AMD``, ``CommonJS`` and returns a global ``audioFX``.
+It uses ``UMD`` and therefore is compatible with ``AMD``, ``CommonJS`` and returns a global ``AudioFX``.
 This is the list of browsers that support the Web Audio API, that means it should work there, albeit not every version has been tested. Test reports are very welcome!
 
 - Chrome 14+
