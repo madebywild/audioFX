@@ -89,8 +89,8 @@ Example:
 ```javascript
 var TestAudio = new AudioFX("test.mp3", function(){
     this.play();
-    TestAudio.changeFilter(f,q);
-}, {loop:true});
+    TestAudio.changeVolume(0.8);
+});
 ```
 
 ### changeFilter(frequency, quality)
