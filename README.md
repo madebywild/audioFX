@@ -11,25 +11,25 @@ Currently only a lowpass-filter is available and things are very **alpha** as th
 Waiting for approval.
 ``<script src="//cdn.jsdelivr.net/audiofx/latest/audioFX.min.js"></script>``
 
-### Bower
+### Bower [![Bower version](https://badge.fury.io/bo/AudioFX.svg)](http://badge.fury.io/bo/AudioFX)
 
-``bower install AudioFX`` [![Bower version](https://badge.fury.io/bo/AudioFX.svg)](http://badge.fury.io/bo/AudioFX)
+``bower install AudioFX``
 
-### NPM
+### NPM [![npm version](https://badge.fury.io/js/audiofx.svg)](http://badge.fury.io/js/audiofx)
 
-``npm install audiofx`` [![npm version](https://badge.fury.io/js/audiofx.svg)](http://badge.fury.io/js/audiofx)
+``npm install audiofx``
 
 ## Usage Instructions
 
 *Note:* **AudioFX** should be called after the window has loaded to ensure we have access to the Audio Context of the Browser.
 
-#### new AudioFX(url, [callback], [options])
+### new AudioFX(url, [callback], [options])
 
 Creates a new AudioFX instance that represents one loaded Audio file. If you store it in a variable for later use, make sure to ``null`` the variable so it's fully eligible to garbage collection.
  
-``url`` {string} - A URL where to load the file from.
-``callback`` {function} - A function that gets called once the buffer has been loaded and we are ready for playback. *optional*
-``options`` {object} - Custom options on instance level. *optional*
+- ``url`` {string} - A URL where to load the file from.
+- ``callback`` {function} - A function that gets called once the buffer has been loaded and we are ready for playback. *optional*
+- ``options`` {object} - Custom options on instance level. *optional*
 
 Example:
 ```javascript
@@ -40,7 +40,7 @@ var TestAudio = new AudioFX("test.mp3", function(){
 });
 ```
 
-#### play
+### play()
 
 Plays the ``AudioFX`` instance from the beginning and re-evaluates the options of the instance before playing (in case they were changed in the meantime).
 You can only play an instance once its file has been loaded, so its the best to use inside the constructor callback function.
@@ -52,7 +52,7 @@ var TestAudio = new AudioFX("test.mp3", function(){
 });
 ```
 
-### stop
+### stop()
 
 Stops the ``AudioFX`` instance immediately.
 
@@ -66,7 +66,7 @@ var TestAudio = new AudioFX("test.mp3", function(){
 });
 ```
 
-#### toggle
+### toggle()
 
 Toggles the play/stop state of the ``AudioFX`` instance.
 
@@ -79,9 +79,9 @@ var TestAudio = new AudioFX("test.mp3", function(){
 });
 ```
 
-#### changeVolume
+### changeVolume(volume)
 
-``volume`` {number} - the new volume to set (supply a fraction like 0.5 between 0 and 1)
+- ``volume`` {number} - the new volume to set (supply a fraction like 0.5 between 0 and 1)
 
 You can also use ``volume()`` which is simply syntactic sugar for the ``changeVolume()`` function.
 
@@ -93,10 +93,10 @@ var TestAudio = new AudioFX("test.mp3", function(){
 }, {loop:true});
 ```
 
-#### changeFilter
+### changeFilter(frequency, quality)
 
-``frequency`` {number} - the frequency of the filter (supply a fraction like 0.5 between 0 and 1)
-``quality`` {number} - the volume (supply a fraction like 0.5 between 0 and 1)
+- ``frequency`` {number} - the frequency of when the filter cuts off (supply a fraction like 0.5 between 0 and 1) for more info see http://en.wikipedia.org/wiki/Low-pass_filter
+- ``quality`` {number} - the quality of the filter (supply a fraction like 0.5 between 0 and 1) for more info see: http://en.wikipedia.org/wiki/Q_factor
 
 You can also use ``filter()`` which is simply syntactic sugar for the ``changeFilter()`` function.
 
@@ -112,7 +112,7 @@ var TestAudio = new AudioFX("test.mp3", function(){
 }, {loop:true});
 ```
 
-#### destroy
+### destroy()
 
 Stops and destroys the ``AudioFX`` instance, be sure to ``null`` the variable/references to completely get rid of it in the memory.
 
