@@ -32,7 +32,7 @@ var Audio = new audioFX("test.mp3", function(){
     document.addEventListener('mousedown', function(){
       Audio.toggle();
     });
-  }, {loop:true});
+}, {loop:true});
 ```
 
 ## Dependencies
@@ -42,6 +42,8 @@ var Audio = new audioFX("test.mp3", function(){
 ## Compatibility
 
 This is the list of browsers that support the Web Audio API, that means it should work there, albeit not every version has been tested. Test reports are very welcome!
+
+It uses ``UMD`` and therefore is compatible with ``AMD``, ``CommonJS`` and returns a global ``audioFX``.
 
 - Chrome 14+
 - Firefox 23+
@@ -58,7 +60,6 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 - [ ] Global Volume Change across all filterBox instances
 - [ ] Fade In / Fade Out
 - [ ] Reverb
-- [ ] AMD / Node Module Export
 
 ## License
 

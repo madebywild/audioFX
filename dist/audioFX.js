@@ -1,3 +1,12 @@
+(function(root, factory) {
+  if (typeof define === 'function' && define.amd) {
+    define([], factory);
+  } else if (typeof exports === 'object') {
+    module.exports = factory();
+  } else {
+    root.AudioFX = factory();
+  }
+}(this, function() {
 "use strict";
 
 var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
@@ -345,3 +354,5 @@ var audioFX = (function () {
 
   return audioFX;
 })();
+return AudioFX;
+}));
