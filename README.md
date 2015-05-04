@@ -21,19 +21,18 @@ High-Level Audio Effects using the Web Audio API in JavaScript, ~1-2 KB gzipped.
 Should be called after the window has loaded to ensure we have access to the Audio Context of the Browser.
 
 Example:
-```
-var Audio = new audioFX("test.mp3", function(){
-    this.play();
-    document.addEventListener('mousemove', function(e){
-      var f = e.pageX / window.innerWidth;
-      var q = e.pageY / window.innerHeight;
-      Audio.changeFilter(f,q);
-    });
-    document.addEventListener('mousedown', function(){
-      Audio.toggle();
-    });
-}, {loop:true});
-```
+
+    var Audio = new audioFX("test.mp3", function(){
+        this.play();
+        document.addEventListener('mousemove', function(e){
+          var f = e.pageX / window.innerWidth;
+          var q = e.pageY / window.innerHeight;
+          Audio.changeFilter(f,q);
+        });
+        document.addEventListener('mousedown', function(){
+          Audio.toggle();
+        });
+    }, {loop:true});
 
 ## Dependencies
 
