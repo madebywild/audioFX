@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AudioFX Example</title>
+  <style>
+    html, body {
+      margin: 0;
+      padding: 100px;
+      height: 100%;
+      width: 100%;
+      overflow: hidden;
+      background: #7a7677;
+    }
+    a {
+      text-align: center;
+      color: #fff;
+      font-family: 'Lucida Grande', 'Lucida Sans Unicode', sans-serif;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body>
+<a href="https://github.com/madebywild/audioFX">View on Github</a>
+<script src="AudioFX.js"></script>
+<script>
+  var TestAudio = new AudioFX("test.mp3", function(){
+    this.play();
+    document.addEventListener('mousemove', function(e){
+      var f = e.pageX / window.innerWidth;
+      var q = e.pageY / window.innerHeight;
+      TestAudio.changeFilter(f,q);
+    });
+    document.addEventListener('mousedown', function(){
+      TestAudio.toggle();
+    });
+  }, {loop:true});
+</script>
+</body>
+</html>
