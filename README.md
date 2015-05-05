@@ -4,6 +4,8 @@ High-Level Audio Effects using the Web Audio API in JavaScript, ~1-2 KB gzipped.
 
 Currently only a lowpass-filter is available and things are very **alpha** as there is not a single test yet. API **will** change in the future.
 
+[Demo](http://madebywild.github.io/audioFX/)
+
 ## Installation
 
 ### CDN
