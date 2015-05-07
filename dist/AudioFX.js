@@ -51,7 +51,6 @@ var AudioFX = (function () {
       window.AudioFXGlobal = {};
       // init context with prefixes
       try {
-        console.log(window.AudioContext, window.webkitAudioContext);
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         window.AudioFXGlobal.context = new AudioContext();
       } catch (e) {
@@ -86,14 +85,14 @@ var AudioFX = (function () {
     // create gain node
     this.gainNode = window.AudioFXGlobal.context.createGain();
     // create filter node
-    this.filter = window.AudioFXGlobal.context.createBiquadFilter();
+    this.filterNode = window.AudioFXGlobal.context.createBiquadFilter();
     // filter.type is defined as string type in the latest API. But this is defined as number type in old API.
-    this.filter.type = typeof this.filter.type === "string" ? "lowpass" : 0; // LOWPASS
+    this.filterNode.type = typeof this.filterNode.type === "string" ? "lowpass" : 0; // LOWPASS
     // if a filter frequency was set in the options, use it, otherwise fall back to the sampleRate, which is the maximum
     if (this.options.filterFrequency) {
-      this.filter.frequency.value = this.options.filterFrequency;
+      this.filterNode.frequency.value = this.options.filterFrequency;
     } else {
-      this.filter.frequency.value = window.AudioFXGlobal.context.sampleRate;
+      this.filterNode.frequency.value = window.AudioFXGlobal.context.sampleRate;
     }
     // if there's directly a url provided, the load it
     this.loadFile(url);
@@ -161,9 +160,9 @@ var AudioFX = (function () {
       // assign buffer to source
       this.source.buffer = this.buffer;
       // connect source to filter
-      this.source.connect(this.filter);
+      this.source.connect(this.filterNode);
       // connect filter to gain
-      this.filter.connect(this.gainNode);
+      this.filterNode.connect(this.gainNode);
       // connect gain to output
       this.gainNode.connect(window.AudioFXGlobal.context.destination);
     }
@@ -274,8 +273,8 @@ var AudioFX = (function () {
       // Compute a multiplier from 0 to 1 based on an exponential scale.
       var multiplier = Math.pow(2, numberOfOctaves * (frequency - 1));
       // Get back to the frequency value between min and max.
-      this.filter.frequency.value = maxValue * multiplier;
-      this.filter.Q.value = quality * this["const"].QUALITY_MULTIPLIER;
+      this.filterNode.frequency.value = maxValue * multiplier;
+      this.filterNode.Q.value = quality * this["const"].QUALITY_MULTIPLIER;
       // return for chaining
       return this;
     }
@@ -286,9 +285,14 @@ var AudioFX = (function () {
      * Destroys the instance, make sure to clean all reference to it for Garbage Collection
      */
     value: function destroy() {
-      this.stop();
-      var self = this;
-      self = null;
+      if (this.playing) {
+        this.stop();
+      }
+      for (var prop in this) {
+        if (this.hasOwnProperty(prop)) {
+          delete this[prop];
+        }
+      }
     }
   }, {
     key: "volume",
