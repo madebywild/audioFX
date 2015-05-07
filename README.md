@@ -147,6 +147,9 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 
 ## Roadmap
 
+- [ ] currentTime
+- [ ] hasLoaded
+- [ ] real pause / no stop in toggle
 - [ ] Proper Tests, obviously
 - [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 - [ ] autoplay option

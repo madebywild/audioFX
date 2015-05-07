@@ -9,9 +9,9 @@
 }(this, function() {
 "use strict";
 
-var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
-
 var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 /*global window,AudioContext,XMLHttpRequest */
 
@@ -34,44 +34,67 @@ var AudioFX = (function () {
     };
     // set defaultOptions
     var defaultOptions = {
-      loop: false
+      loop: false,
+      filterFrequency: null
     };
     // overwrite defaults with supplied options – if an object is supplied
     if (AudioFX.isObject(options)) {
       this.options = AudioFX.extend(defaultOptions, options);
+    } else {
+      this.options = defaultOptions;
     }
     // initialize the instance vars
     this.playing = false;
-    // init context with prefixes
-    try {
-      window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      this.context = new AudioContext();
-    } catch (e) {
-      AudioFX.error("Web Audio API is not supported in this browser");
+    // init global audioFX if hasn't been already
+    if (!window.AudioFXGlobal) {
+      // first allocate and then fill
+      window.AudioFXGlobal = {};
+      // init context with prefixes
+      try {
+        console.log(window.AudioContext, window.webkitAudioContext);
+        window.AudioContext = window.AudioContext || window.webkitAudioContext;
+        window.AudioFXGlobal.context = new AudioContext();
+      } catch (e) {
+        AudioFX.error("Web Audio API Error: " + e.message);
+      }
     }
     // register the supplied url, I'd say there's no valid-URL-check necessary
-    this.url = url;
-    // if the callback is really a function, register it
-    if (AudioFX.isFunction(callback)) {
-      this.onload = callback;
+    if (typeof url !== "string") {
+      AudioFX.error("You have to provide a valid url string.");
     } else {
-      AudioFX.error("Supplied callback is not a function.");
+      this.url = url;
+    }
+    // if a callback was provided
+    if (callback) {
+      // if the callback is really a function, register it
+      if (AudioFX.isFunction(callback)) {
+        this.onload = callback;
+      } else {
+        AudioFX.error("Supplied callback is not a function.");
+      }
     }
     // register empty buffer var
     this.buffer = null;
+    // we don't know the duration yet
+    this.duration = 0;
     // create empty buffer source var
     this.source = null;
     // normalize browser syntax
-    if (!this.context.createGain) {
-      this.context.createGain = this.context.createGainNode;
+    if (!window.AudioFXGlobal.context.createGain) {
+      window.AudioFXGlobal.context.createGain = window.AudioFXGlobal.context.createGainNode;
     }
     // create gain node
-    this.gainNode = this.context.createGain();
+    this.gainNode = window.AudioFXGlobal.context.createGain();
     // create filter node
-    this.filter = this.context.createBiquadFilter();
+    this.filter = window.AudioFXGlobal.context.createBiquadFilter();
     // filter.type is defined as string type in the latest API. But this is defined as number type in old API.
     this.filter.type = typeof this.filter.type === "string" ? "lowpass" : 0; // LOWPASS
-    this.filter.frequency.value = this.options.filterFrequency || this.context.sampleRate;
+    // if a filter frequency was set in the options, use it, otherwise fall back to the sampleRate, which is the maximum
+    if (this.options.filterFrequency) {
+      this.filter.frequency.value = this.options.filterFrequency;
+    } else {
+      this.filter.frequency.value = window.AudioFXGlobal.context.sampleRate;
+    }
     // if there's directly a url provided, the load it
     this.loadFile(url);
     // no return needed for constructor
@@ -96,29 +119,32 @@ var AudioFX = (function () {
       // define what happens when we get a response from the request
       this.request.onload = function () {
         // Asynchronously decode the audio file data in request.response
-        instance.context.decodeAudioData(
+        window.AudioFXGlobal.context.decodeAudioData(
         // the arrayBuffer we received
         instance.request.response,
         // do this with it
         function (buffer) {
           // if we don't have a buffer, throw an error
           if (!buffer) {
-            instance.error("Error decoding file data: " + url);
-            return;
+            AudioFX.error("Error decoding file data: " + url);
           }
           // otherwise save the buffer
           instance.buffer = buffer;
-          // and fire the callback
-          instance.onload(instance);
+          // save the duration information to the instance
+          instance.duration = parseFloat(buffer.duration);
+          // and fire the callback if we have one
+          if (AudioFX.isFunction(instance.onload)) {
+            instance.onload(instance);
+          }
         },
         // if you can't make it, tell me why
         function (error) {
-          instance.error("Error at decodeAudioData", error);
+          AudioFX.error("Error at decodeAudioData" + error);
         });
       };
       // bind error function in case things go wrong
       this.request.onerror = function () {
-        AudioFX.error("XMLHttpRequest errored.");
+        AudioFX.error("XMLHttpRequest errored. Readystate: " + this.readyState + ". Status: " + this.status);
       };
       // actually send the request we created
       this.request.send();
@@ -131,7 +157,7 @@ var AudioFX = (function () {
      */
     value: function createAndConnectNodes() {
       // create new Buffer Source
-      this.source = this.context.createBufferSource();
+      this.source = window.AudioFXGlobal.context.createBufferSource();
       // assign buffer to source
       this.source.buffer = this.buffer;
       // connect source to filter
@@ -139,7 +165,7 @@ var AudioFX = (function () {
       // connect filter to gain
       this.filter.connect(this.gainNode);
       // connect gain to output
-      this.gainNode.connect(this.context.destination);
+      this.gainNode.connect(window.AudioFXGlobal.context.destination);
     }
   }, {
     key: "play",
@@ -242,7 +268,7 @@ var AudioFX = (function () {
     value: function changeFilter(frequency, quality) {
       // Clamp the frequency between the minimum value (40 Hz) and half of the sampling rate.
       var minValue = 40;
-      var maxValue = this.context.sampleRate / 2;
+      var maxValue = window.AudioFXGlobal.context.sampleRate / 2;
       // Logarithm (base 2) to compute how many octaves fall in the range.
       var numberOfOctaves = Math.log(maxValue / minValue) / Math.LN2;
       // Compute a multiplier from 0 to 1 based on an exponential scale.
@@ -349,7 +375,7 @@ var AudioFX = (function () {
      * @param {string} errorMessage - the message for output
      */
     value: function error(errorMessage) {
-      return console.error("AudioFX: Error! " + errorMessage);
+      throw new Error("AudioFX: Error! " + errorMessage);
     }
   }]);
 
