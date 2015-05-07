@@ -2,7 +2,7 @@
 
 High-Level Audio Effects using the Web Audio API in JavaScript, ~1-2 KB gzipped.
 
-Currently only a lowpass-filter is available and things are very **alpha** as there is not a single test yet. API **will** change in the future.
+Currently only a lowpass-filter is available and things are very **alpha** as there is not a single test yet. API **will** change in the future. Currently 91% test coverage in latest Chrome, FF and Safari.
 
 [Demo](http://madebywild.github.io/audioFX/)
 
@@ -150,7 +150,6 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 - [ ] currentTime
 - [ ] hasLoaded
 - [ ] real pause / no stop in toggle
-- [ ] Proper Tests, obviously
 - [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 - [ ] autoplay option
 - [ ] all Filter types (highpass etc.)
