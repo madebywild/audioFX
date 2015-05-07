@@ -1,6 +1,6 @@
 {
   "name": "audiofx",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "High-Level Audio Effects using the Web Audio API in JavaScript.",
   "main": "dist/AudioFX.min.js",
   "scripts": {
