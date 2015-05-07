@@ -10,8 +10,7 @@ Currently only a lowpass-filter is available and things are still very **alpha**
 
 ### CDN
 
-Waiting for approval.
-``<script src="//cdn.jsdelivr.net/audiofx/latest/audioFX.min.js"></script>``
+``<script src="//cdn.jsdelivr.net/audiofx/latest/AudioFX.min.js"></script>``
 
 ### Bower [![Bower version](https://badge.fury.io/bo/AudioFX.svg)](http://badge.fury.io/bo/AudioFX)
 
@@ -195,6 +194,8 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 - [ ] Global Volume Change across all audioFX instances
 - [ ] all Filter types (highpass etc.)
 - [ ] Reverb (Convolver)
+- [ ] Delay
+- [ ] AnalyzerNode
 - [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 - [ ] Fade In / Fade Out (non-linear)
 - [ ] panning position with panner.setPosition(x, y, z);
