@@ -192,7 +192,6 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 
 ## Roadmap
 
-- [ ] autoplay option
 - [ ] Global Volume Change across all audioFX instances
 - [ ] all Filter types (highpass etc.)
 - [ ] Reverb (Convolver)
