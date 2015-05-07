@@ -18,7 +18,8 @@ class AudioFX {
     // set defaultOptions
     let defaultOptions = {
       loop: false,
-      filterFrequency: null
+      filterFrequency: null,
+      autoplay: false
     };
     // overwrite defaults with supplied options – if an object is supplied
     if(AudioFX.isObject(options)) {
@@ -116,6 +117,10 @@ class AudioFX {
           instance.duration = parseFloat(buffer.duration);
           // set hasLoaded
           instance.hasLoaded = true;
+          // autoplay if set
+          if(instance.options.autoplay === true){
+            instance.play();
+          }
           // and fire the callback if we have one
           if(AudioFX.isFunction(instance.onload)) {
             instance.onload(instance);

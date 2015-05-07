@@ -33,12 +33,20 @@ Creates a new AudioFX instance that represents one loaded Audio file. If you sto
 - ``callback`` {function} - A function that gets called once the buffer has been loaded and we are ready for playback. *optional*
 - ``options`` {object} - Custom options on instance level. *optional*
 
+#### options
+
+- ``loop`` {boolean} - If the audio file should loop upon playing (Default: false)
+- ``filterFrequency`` {float} - A fraction between 0 and 1, representing the set filter frequency from start. If ``null`` is specified, the filter is set to the samplerate and therefore not hearable (Default: null)
+- ``autoplay`` {boolean} - If set to true (Default: false)
+
 Example:
 ```javascript
 var TestAudio = new AudioFX("test.mp3", function(){
     // do something
 }, {
-    loop: true
+    loop: true,
+    filterFrequency: 0.5,
+    autoplay: true
 });
 ```
 
@@ -184,12 +192,12 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 
 ## Roadmap
 
-- [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 - [ ] autoplay option
-- [ ] all Filter types (highpass etc.)
 - [ ] Global Volume Change across all audioFX instances
-- [ ] Fade In / Fade Out (non-linear)
+- [ ] all Filter types (highpass etc.)
 - [ ] Reverb (Convolver)
+- [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
+- [ ] Fade In / Fade Out (non-linear)
 
 ## License
 

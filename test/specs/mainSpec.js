@@ -56,10 +56,13 @@ describe("When an instance is created", function() {
     var init = function () {
       new AudioFX(testAudioUrl, function () {
         expect(this.options.loop).toBe(true);
+        expect(this.options.autoplay).toBe(true);
+        expect(this.playing).toBe(true);
         done();
       }, {
         loop: true,
-        filterFrequency: 0.5
+        filterFrequency: 0.5,
+        autoplay: true
       });
     };
     init();
