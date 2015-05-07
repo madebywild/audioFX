@@ -18,7 +18,6 @@
 <script src="../dist/AudioFX.js"></script>
 <script>
   var TestAudio = new AudioFX("test.mp3", function(){
-    this.play();
     document.addEventListener('mousemove', function(e){
       var f = e.pageX / window.innerWidth;
       var q = e.pageY / window.innerHeight;
@@ -27,7 +26,10 @@
     document.addEventListener('mousedown', function(){
       TestAudio.toggle();
     });
-  }, {loop:true});
+  }, {
+    loop:true,
+    autoplay:true
+  });
 </script>
 </body>
 </html>

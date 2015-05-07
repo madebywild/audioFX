@@ -197,6 +197,7 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 - [ ] Reverb (Convolver)
 - [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 - [ ] Fade In / Fade Out (non-linear)
+- [ ] panning position with panner.setPosition(x, y, z);
 
 ## License
 
