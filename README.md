@@ -1,4 +1,4 @@
-# audioFX [![GitHub version](https://badge.fury.io/gh/madebywild%2FaudioFX.svg)](http://badge.fury.io/gh/madebywild%2FaudioFX)
+# audioFX
 
 High-Level Audio Effects using the Web Audio API in JavaScript, ~1-2 KB gzipped.
 
@@ -12,11 +12,11 @@ Currently only a lowpass-filter is available and things are still very **alpha**
 
 ``<script src="//cdn.jsdelivr.net/audiofx/latest/AudioFX.min.js"></script>``
 
-### Bower [![Bower version](https://badge.fury.io/bo/AudioFX.svg)](http://badge.fury.io/bo/AudioFX)
+### Bower
 
 ``bower install AudioFX``
 
-### NPM [![npm version](https://badge.fury.io/js/audiofx.svg)](http://badge.fury.io/js/audiofx)
+### NPM
 
 ``npm install audiofx``
 
