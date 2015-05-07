@@ -96,9 +96,10 @@ describe("When an instance is created", function() {
         expect(this.playing).toBe(true);
         this.changeVolume(0.5);
         expect(this.gainNode.gain.value).toBe(0.25); // = 0.5 * 0.5
-        this.changeVolume(0.75);
-        this.volume(0.5);
-        expect(this.gainNode.gain.value).toBe(0.25); // = 0.5 * 0.5
+        this.changeVolume(1.2);
+        expect(this.gainNode.gain.value).toBe(1); // = 1 * 1
+        this.volume(-0.5);
+        expect(this.gainNode.gain.value).toBe(0); // = 0.5 * 0.5
         this.changeFilter(0.5, 0.5);
         expect(this.filterNode.frequency.value).toBe(939.1485595703125);
         expect(this.filterNode.Q.value).toBe(15);
@@ -118,6 +119,7 @@ describe("When an instance is created", function() {
   it("destroy is working", function (done) {
     var init = function () {
       new AudioFX(testAudioUrl, function () {
+        this.play();
         this.play();
         this.destroy();
         expect(this.playing).toBe(undefined);
@@ -154,6 +156,30 @@ describe("When an instance is created", function() {
         done();
       }, {
         loop: true
+      });
+    };
+    init();
+    expect(init).not.toThrow();
+  });
+
+  it("duration and currentTime are returned", function(done){
+    var init = function () {
+      new AudioFX(testAudioUrl, function () {
+        this.play();
+        var self = this;
+        setTimeout(function(){
+          self.pause();
+          expect(self.getCurrentTime()).toBeGreaterThan(0.08);
+          expect(self.getCurrentTime()).toBeLessThan(0.12);
+          expect(self.getDuration()).toBe(32.021043083900224);
+          self.play();
+          setTimeout(function(){
+            expect(self.getCurrentTime()).toBeGreaterThan(0.18);
+            expect(self.getCurrentTime()).toBeLessThan(0.22);
+            self.pause();
+            done();
+          },100);
+        },100);
       });
     };
     init();

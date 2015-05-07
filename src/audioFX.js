@@ -28,6 +28,7 @@ class AudioFX {
     }
     // initialize the instance vars
     this.playing = false;
+    this.hasLoaded = false;
     // init global audioFX if hasn't been already
     if(!window.AudioFXGlobal) {
       // first allocate and then fill
@@ -77,6 +78,8 @@ class AudioFX {
     }else{
       this.filterNode.frequency.value = window.AudioFXGlobal.context.sampleRate;
     }
+    // set the pauseTime to 0, so we can add to it
+    this._pauseTime = 0;
     // if there's directly a url provided, the load it
     this.loadFile(url);
     // no return needed for constructor
@@ -111,6 +114,8 @@ class AudioFX {
           instance.buffer = buffer;
           // save the duration information to the instance
           instance.duration = parseFloat(buffer.duration);
+          // set hasLoaded
+          instance.hasLoaded = true;
           // and fire the callback if we have one
           if(AudioFX.isFunction(instance.onload)) {
             instance.onload(instance);
@@ -149,8 +154,9 @@ class AudioFX {
   /**
    * Plays the Audio
    * @param {number} when - The when parameter defines when the play will start. If when represents a time in the past, the play will start immediately.
+   * @param {number} offset - The offset parameter describes the offset time in the buffer (in seconds) where playback will begin. If 0 is passed in for this value, then playback will start from the beginning of the buffer.
    */
-  play(when = 0){
+  play(offset = 0){
     // if we were playing already, stop the previous instance, otherwise we can't control it anymore
     if(this.playing === true){
       this.stop();
@@ -165,11 +171,42 @@ class AudioFX {
     if (!this.source.start) {
       this.source.start = this.source.noteOn;
     }
-    // play
-    this.source.start(when);
+    // if previously was paused
+    if(this._pauseTime){
+      // play from where was paused last time
+      this.source.start(0, this._pauseTime);
+    }else{
+      // play from beginning or offset
+      this.source.start(0, offset);
+    }
+    // set new play start time
+    this._playTime = window.AudioFXGlobal.context.currentTime;
+    // we are now playing
     this.playing = true;
     // return for chaining
     return this;
+  }
+
+  /**
+   * Pauses the audio at the current position
+   */
+  pause(){
+    // only if it has been started
+    if(this._playTime){
+      // playTime is always when play is pressed, calculate the time between the last play
+      var addedTime = window.AudioFXGlobal.context.currentTime - this._playTime;
+      // add that time
+      this._pauseTime = this._pauseTime + addedTime;
+      // if there is an old version of the API
+      if (!this.source.stop) {
+        // shim stop from noteOff
+        this.source.stop = this.source.noteOff;
+      }
+      // now stop
+      this.source.stop();
+      // we're not playing anymore
+      this.playing = false;
+    }
   }
 
   /**
@@ -182,6 +219,8 @@ class AudioFX {
       // shim stop from noteOff
       this.source.stop = this.source.noteOff;
     }
+    // reset the paused time because we're at 0 again
+    this._pauseTime = null;
     // now actually do it
     this.source.stop(when);
     this.playing = false;
@@ -196,7 +235,7 @@ class AudioFX {
     // If we are playing
     if(this.playing === true){
       // then stop
-      this.stop();
+      this.pause();
     }else{
       // otherwise we have stopped, so play
       this.play();
@@ -242,6 +281,26 @@ class AudioFX {
     this.filterNode.Q.value = quality * this.const.QUALITY_MULTIPLIER;
     // return for chaining
     return this;
+  }
+
+  /**
+   * Gets the current playhead of the AudioFX instance
+   * @returns {*}
+   */
+  getCurrentTime(){
+    if(this.playing){
+      return this._pauseTime + (window.AudioFXGlobal.context.currentTime - this._playTime);
+    }else{
+      return this._pauseTime;
+    }
+  }
+
+  /**
+   * Gets the duration of the AudioFX instance
+   * @returns {Number|*|AudioFX.duration}
+   */
+  getDuration(){
+    return this.duration;
   }
 
   /**

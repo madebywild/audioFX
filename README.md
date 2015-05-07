@@ -42,10 +42,23 @@ var TestAudio = new AudioFX("test.mp3", function(){
 });
 ```
 
-### play()
+### play(offset)
 
-Plays the ``AudioFX`` instance from the beginning and re-evaluates the options of the instance before playing (in case they were changed in the meantime).
+- ``offset`` {number} - From how far into the audio file playback should start. 0 means it starts from the beginning (default: 0)
+
+Plays the ``AudioFX`` instance from the supplied offset and re-evaluates the options of the instance before playing (in case they were changed in the meantime).
 You can only play an instance once its file has been loaded, so its the best to use inside the constructor callback function.
+
+Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    this.play(0);
+});
+```
+
+### pause()
+
+Pauses the ``AudioFX`` instance at the current position. When now play()'ed again, it will start where we paused from.
 
 Example:
 ```javascript
@@ -56,7 +69,7 @@ var TestAudio = new AudioFX("test.mp3", function(){
 
 ### stop()
 
-Stops the ``AudioFX`` instance immediately.
+Stops the ``AudioFX`` instance immediately and resets the pause timer.
 
 Example:
 ```javascript
@@ -70,7 +83,7 @@ var TestAudio = new AudioFX("test.mp3", function(){
 
 ### toggle()
 
-Toggles the play/stop state of the ``AudioFX`` instance.
+Toggles the play/pause state of the ``AudioFX`` instance.
 
 Example:
 ```javascript
@@ -114,6 +127,30 @@ var TestAudio = new AudioFX("test.mp3", function(){
 }, {loop:true});
 ```
 
+### getDuration()
+
+Returns the duration of the ``AudioFX`` instance.
+
+Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    this.play();
+    console.log(this.getDuration());
+});
+```
+
+### getCurrentTime()
+
+Returns the current position of the ``AudioFX`` instance playhead.
+
+Example:
+```javascript
+var TestAudio = new AudioFX("test.mp3", function(){
+    this.play();
+    console.log(this.getCurrentTime());
+});
+```
+
 ### destroy()
 
 Stops and destroys the ``AudioFX`` instance, be sure to ``null`` the variable/references to completely get rid of it in the memory.
@@ -147,9 +184,6 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 
 ## Roadmap
 
-- [ ] currentTime
-- [ ] hasLoaded
-- [ ] real pause / no stop in toggle
 - [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 - [ ] autoplay option
 - [ ] all Filter types (highpass etc.)
