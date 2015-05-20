@@ -188,6 +188,11 @@ If you want to use multiple AudioFX instances, there is a global ``AudioFXGlobal
 
 Changes the volume on **all** instances. Be aware that there obviously is no fine-grained control over which instances are affected. Useful if all have the same volume anyway and you want to quickly mute/unmute the website or have a global volume slider. 
 
+Example:
+```javascript
+AudioFXGlobal.changeVolumeAll(0.3);
+```
+
 ### destroyAll()
 
 Stops and destroys all ``AudioFX`` instances, be sure to ``null`` the variable/references to completely get rid of them in the memory.
