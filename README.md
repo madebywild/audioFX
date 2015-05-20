@@ -1,4 +1,4 @@
-# audioFX
+# audioFX [![bitHound Score](https://www.bithound.io/github/madebywild/audioFX/badges/score.svg)](https://www.bithound.io/github/madebywild/audioFX/master)
 
 High-Level Audio Effects using the Web Audio API in JavaScript, ~1-2 KB gzipped.
 
