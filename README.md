@@ -75,6 +75,9 @@ Example:
 ```javascript
 var TestAudio = new AudioFX("test.mp3", function(){
     this.play();
+    setTimeout(function(){
+      TestAudio.pause();
+    },1000);
 });
 ```
 
@@ -227,6 +230,30 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 - [ ] Fade In / Fade Out (non-linear)
 - [ ] panning position with panner.setPosition(x, y, z);
 - [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
+
+## FAQ
+
+### Is there some kind of loading queue?
+
+For the sake of separation, currently there is no loading queue of multiple audiofiles, although it is really simple to build in your implementation:
+
+```javascript
+var queue = [{name:"test", url:"test.mp3"}, {name:"test2", url:"test2.mp3"}];
+var loaded = 0;
+var instances = [];
+queue.forEach(function(obj){
+  instances.push({
+    name: obj.name,
+    obj: new AudioFX(obj.url, allLoaded)
+  });
+});
+function allLoaded(){
+  loaded++;
+  if(loaded === queue.length){
+    console.log('all are loaded!');
+  }
+}
+```
 
 ## License
 
