@@ -5,26 +5,8 @@ jasmine.DEFAULT_TIMEOUT_INTERVAL = 10000;
 
 describe("When an instance is created", function() {
 
-  it("it doesn't work without a supplied url", function () {
-    var AudioTest;
-    var init = function () {
-      AudioTest = new AudioFX();
-    };
-    expect(init).toThrow();
-    expect(AudioTest).not.toBeDefined();
-    // release for GC
-    AudioTest = null;
-  });
-
-  it("it doesn't work with a non-function callback", function () {
-    var AudioTest;
-    var init = function () {
-      AudioTest = new AudioFX(testAudioUrl, "bad");
-    };
-    expect(init).toThrow();
-    expect(AudioTest).not.toBeDefined();
-    // release for GC
-    AudioTest = null;
+  afterEach(function(){
+    //window.AudioFXGlobal.cache = [];
   });
 
   it("it works with a callback function", function (done) {
@@ -50,6 +32,40 @@ describe("When an instance is created", function() {
     };
     init();
     expect(init).not.toThrow();
+  });
+
+  it("it works loading from cache", function (done) {
+    var prevLength = window.AudioFXGlobal.cache.length;
+    function init() {
+      new AudioFX(testAudioUrl, function () {
+        expect(window.AudioFXGlobal.cache.length).toBeGreaterThan(prevLength);
+        prevLength = window.AudioFXGlobal.cache.length;
+        init2();
+      });
+    }
+    function init2() {
+      new AudioFX(testAudioUrl, function () {
+        expect(this.buffer.toString()).toBe("[object AudioBuffer]");
+        expect(this.const.toString()).toBe("[object Object]");
+        if(window.AudioFXGlobal.context.toString() === "[object webkitAudioContext]"){
+          expect(window.AudioFXGlobal.context.toString()).toBe("[object webkitAudioContext]");
+        }else{
+          expect(window.AudioFXGlobal.context.toString()).toBe("[object AudioContext]");
+        }
+        expect(typeof this.duration).toBe("number");
+        expect(this.filterNode.toString()).toBe("[object BiquadFilterNode]");
+        expect(this.gainNode.toString()).toBe("[object GainNode]");
+        expect(typeof this.onload).toBe("function");
+        expect(this.options.toString()).toBe("[object Object]");
+        expect(this.playing).toBe(false);
+        expect(typeof this.url).toBe("string");
+        expect(window.AudioFXGlobal.cache.length).toBeGreaterThan(prevLength);
+        done();
+      });
+    }
+    init();
+    expect(init).not.toThrow();
+    expect(init2).not.toThrow();
   });
 
   it("it works with options", function (done) {
@@ -104,15 +120,39 @@ describe("When an instance is created", function() {
         this.volume(-0.5);
         expect(this.gainNode.gain.value).toBe(0); // = 0.5 * 0.5
         this.changeFilter(0.5, 0.5);
-        expect(this.filterNode.frequency.value).toBe(939.1485595703125);
+        expect(this.filterNode.frequency.value).toBe(979.7958984375);
         expect(this.filterNode.Q.value).toBe(15);
         this.changeFilter(0.75, 0.75);
         this.filter(0.5, 0.5);
-        expect(this.filterNode.frequency.value).toBe(939.1485595703125);
+        expect(this.filterNode.frequency.value).toBe(979.7958984375);
         expect(this.filterNode.Q.value).toBe(15);
         done();
       }, {
         loop: true
+      });
+    };
+    init();
+    expect(init).not.toThrow();
+  });
+
+  it("duration and currentTime are returned", function(done){
+    var init = function () {
+      new AudioFX(testAudioUrl, function () {
+        this.play();
+        var self = this;
+        setTimeout(function(){
+          self.pause();
+          expect(self.getCurrentTime()).toBeGreaterThan(0.08);
+          expect(self.getCurrentTime()).toBeLessThan(0.17);
+          expect(parseFloat(self.getDuration().toFixed(3))).toBe(32.021);
+          self.play();
+          setTimeout(function(){
+            expect(self.getCurrentTime()).toBeGreaterThan(0.18);
+            expect(self.getCurrentTime()).toBeLessThan(0.27);
+            self.pause();
+            done();
+          },100);
+        },100);
       });
     };
     init();
@@ -126,6 +166,7 @@ describe("When an instance is created", function() {
         this.play();
         this.destroy();
         expect(this.playing).toBe(undefined);
+        new AudioFX(testAudioUrl);
         done();
       }, {
         loop: true
@@ -165,28 +206,26 @@ describe("When an instance is created", function() {
     expect(init).not.toThrow();
   });
 
-  it("duration and currentTime are returned", function(done){
+  it("it doesn't work without a supplied url", function () {
+    var AudioTest;
     var init = function () {
-      new AudioFX(testAudioUrl, function () {
-        this.play();
-        var self = this;
-        setTimeout(function(){
-          self.pause();
-          expect(self.getCurrentTime()).toBeGreaterThan(0.08);
-          expect(self.getCurrentTime()).toBeLessThan(0.12);
-          expect(self.getDuration()).toBe(32.021043083900224);
-          self.play();
-          setTimeout(function(){
-            expect(self.getCurrentTime()).toBeGreaterThan(0.18);
-            expect(self.getCurrentTime()).toBeLessThan(0.22);
-            self.pause();
-            done();
-          },100);
-        },100);
-      });
+      AudioTest = new AudioFX();
     };
-    init();
-    expect(init).not.toThrow();
+    expect(init).toThrow();
+    expect(AudioTest).not.toBeDefined();
+    // release for GC
+    AudioTest = null;
+  });
+
+  it("it doesn't work with a non-function callback", function () {
+    var AudioTest;
+    var init = function () {
+      AudioTest = new AudioFX(testAudioUrl, "bad");
+    };
+    expect(init).toThrow();
+    expect(AudioTest).not.toBeDefined();
+    // release for GC
+    AudioTest = null;
   });
 
   // doesn't work for some reason. when they are logged, they're still functions and not null

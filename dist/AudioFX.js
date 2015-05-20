@@ -7,12 +7,45 @@
     root.AudioFX = factory();
   }
 }(this, function() {
-"use strict";
+'use strict';
 
-var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
+(function () {
+
+  if (Array.prototype.find) return;
+
+  var find = function find(predicate) {
+    var list = Object(this);
+    var length = list.length < 0 ? 0 : list.length >>> 0; // ES.ToUint32;
+    if (length === 0) return undefined;
+    if (typeof predicate !== 'function' || Object.prototype.toString.call(predicate) !== '[object Function]') {
+      throw new TypeError('Array#find: predicate must be a function');
+    }
+    var thisArg = arguments[1];
+    for (var i = 0, value; i < length; i++) {
+      value = list[i];
+      if (predicate.call(thisArg, value, i, list)) return value;
+    }
+    return undefined;
+  };
+
+  if (Object.defineProperty) {
+    try {
+      Object.defineProperty(Array.prototype, 'find', {
+        value: find, configurable: true, enumerable: false, writable: true
+      });
+    } catch (e) {}
+  }
+
+  if (!Array.prototype.find) {
+    Array.prototype.find = find;
+  }
+})();
+
+'use strict';
 /*global window,AudioContext,XMLHttpRequest */
 
 var AudioFX = (function () {
@@ -29,13 +62,18 @@ var AudioFX = (function () {
     _classCallCheck(this, AudioFX);
 
     // set constants
-    this["const"] = {
+    this['const'] = {
       QUALITY_MULTIPLIER: 30
     };
     // set defaultOptions
     var defaultOptions = {
+      // if the audio should loop
       loop: false,
+      // starting volume
+      volume: 1,
+      // the frequency of the filter, null means no filter
       filterFrequency: null,
+      // if it should play immediately after loading
       autoplay: false
     };
     // overwrite defaults with supplied options – if an object is supplied
@@ -51,17 +89,19 @@ var AudioFX = (function () {
     if (!window.AudioFXGlobal) {
       // first allocate and then fill
       window.AudioFXGlobal = {};
+      // init empty cache
+      window.AudioFXGlobal.cache = [];
       // init context with prefixes
       try {
         window.AudioContext = window.AudioContext || window.webkitAudioContext;
         window.AudioFXGlobal.context = new AudioContext();
       } catch (e) {
-        AudioFX.error("Web Audio API Error: " + e.message);
+        AudioFX.error('Web Audio API Error: ' + e.message);
       }
     }
     // register the supplied url, I'd say there's no valid-URL-check necessary
-    if (typeof url !== "string") {
-      AudioFX.error("You have to provide a valid url string.");
+    if (typeof url !== 'string') {
+      AudioFX.error('You have to provide a valid url string.');
     } else {
       this.url = url;
     }
@@ -71,7 +111,7 @@ var AudioFX = (function () {
       if (AudioFX.isFunction(callback)) {
         this.onload = callback;
       } else {
-        AudioFX.error("Supplied callback is not a function.");
+        AudioFX.error('Supplied callback is not a function.');
       }
     }
     // register empty buffer var
@@ -86,10 +126,12 @@ var AudioFX = (function () {
     }
     // create gain node
     this.gainNode = window.AudioFXGlobal.context.createGain();
+    // set the option volume
+    this.gainNode.gain.value = this.options.volume;
     // create filter node
     this.filterNode = window.AudioFXGlobal.context.createBiquadFilter();
     // filter.type is defined as string type in the latest API. But this is defined as number type in old API.
-    this.filterNode.type = typeof this.filterNode.type === "string" ? "lowpass" : 0; // LOWPASS
+    this.filterNode.type = typeof this.filterNode.type === 'string' ? 'lowpass' : 0; // LOWPASS
     // if a filter frequency was set in the options, use it, otherwise fall back to the sampleRate, which is the maximum
     if (this.options.filterFrequency) {
       this.filterNode.frequency.value = this.options.filterFrequency;
@@ -98,13 +140,27 @@ var AudioFX = (function () {
     }
     // set the pauseTime to 0, so we can add to it
     this._pauseTime = 0;
-    // if there's directly a url provided, the load it
-    this.loadFile(url);
+    // set unique id
+    this.id = window.AudioFXGlobal.cache.length + 1;
+    // if there's directly a url provided and it's not in the cache, then load it
+    var cached = window.AudioFXGlobal.cache.find(function (item) {
+      return item.url === url;
+    });
+    // check if a cached version of that url has been found
+    if (window.AudioFXGlobal.cache.length > 0 && cached) {
+      // if so, manually set that it's loaded
+      this.hasLoaded = true;
+      // and make a deep copy of the buffer
+      this.setBuffer(cached.buffer);
+    } else {
+      // nothing found in the cache, so we issue a XHR request
+      this.loadFile(url);
+    }
     // no return needed for constructor
   }
 
   _createClass(AudioFX, [{
-    key: "loadFile",
+    key: 'loadFile',
 
     /**
      * Loads a file from an URL
@@ -114,9 +170,9 @@ var AudioFX = (function () {
       // Load buffer asynchronously
       this.request = new XMLHttpRequest();
       // issue a GET request to the url, the true flag makes it async
-      this.request.open("GET", url, true);
+      this.request.open('GET', url, true);
       // set the responseType to Arraybuffer
-      this.request.responseType = "arraybuffer";
+      this.request.responseType = 'arraybuffer';
       // create reference for the async onload function
       var instance = this;
       // define what happens when we get a response from the request
@@ -127,39 +183,54 @@ var AudioFX = (function () {
         instance.request.response,
         // do this with it
         function (buffer) {
-          // if we don't have a buffer, throw an error
-          if (!buffer) {
-            AudioFX.error("Error decoding file data: " + url);
-          }
-          // otherwise save the buffer
-          instance.buffer = buffer;
-          // save the duration information to the instance
-          instance.duration = parseFloat(buffer.duration);
-          // set hasLoaded
-          instance.hasLoaded = true;
-          // autoplay if set
-          if (instance.options.autoplay === true) {
-            instance.play();
-          }
-          // and fire the callback if we have one
-          if (AudioFX.isFunction(instance.onload)) {
-            instance.onload(instance);
-          }
+          instance.setBuffer(buffer);
         },
         // if you can't make it, tell me why
         function (error) {
-          AudioFX.error("Error at decodeAudioData" + error);
+          AudioFX.error('Error at decodeAudioData' + error);
         });
       };
       // bind error function in case things go wrong
       this.request.onerror = function () {
-        AudioFX.error("XMLHttpRequest errored. Readystate: " + this.readyState + ". Status: " + this.status);
+        AudioFX.error('XMLHttpRequest errored. Readystate: ' + this.readyState + '. Status: ' + this.status);
       };
       // actually send the request we created
       this.request.send();
     }
   }, {
-    key: "createAndConnectNodes",
+    key: 'setBuffer',
+
+    /**
+     * After decoding a buffer or loading an already decoded buffer, set it to the instance
+     * @param buffer - a decoded AudioBuffer
+     * @returns {AudioFX} - Return the current instance for chaining
+     */
+    value: function setBuffer(buffer) {
+      // if we don't have a buffer, throw an error
+      if (!buffer) {
+        AudioFX.error('No Buffer found.');
+      }
+      // save the url to the cache
+      window.AudioFXGlobal.cache.push(this);
+      // otherwise save the buffer
+      this.buffer = AudioFX.clone(buffer);
+      //this.buffer = buffer;
+      // save the duration information to the instance
+      this.duration = parseFloat(buffer.duration);
+      // set hasLoaded
+      this.hasLoaded = true;
+      // autoplay if set
+      if (this.options.autoplay === true) {
+        this.play();
+      }
+      // and fire the callback if we have one
+      if (AudioFX.isFunction(this.onload)) {
+        this.onload(this);
+      }
+      return this;
+    }
+  }, {
+    key: 'createAndConnectNodes',
 
     /**
      * Creates a new BufferSource and connects the nodes after a buffer has loaded, has to be re-done everytime play gets called
@@ -177,11 +248,10 @@ var AudioFX = (function () {
       this.gainNode.connect(window.AudioFXGlobal.context.destination);
     }
   }, {
-    key: "play",
+    key: 'play',
 
     /**
      * Plays the Audio
-     * @param {number} when - The when parameter defines when the play will start. If when represents a time in the past, the play will start immediately.
      * @param {number} offset - The offset parameter describes the offset time in the buffer (in seconds) where playback will begin. If 0 is passed in for this value, then playback will start from the beginning of the buffer.
      */
     value: function play() {
@@ -217,7 +287,7 @@ var AudioFX = (function () {
       return this;
     }
   }, {
-    key: "pause",
+    key: 'pause',
 
     /**
      * Pauses the audio at the current position
@@ -241,7 +311,7 @@ var AudioFX = (function () {
       }
     }
   }, {
-    key: "stop",
+    key: 'stop',
 
     /**
      * Stops the audio
@@ -264,7 +334,7 @@ var AudioFX = (function () {
       return this;
     }
   }, {
-    key: "toggle",
+    key: 'toggle',
 
     /**
      * Play/Pause toggles the audio
@@ -282,7 +352,7 @@ var AudioFX = (function () {
       return this;
     }
   }, {
-    key: "changeVolume",
+    key: 'changeVolume',
 
     /**
      * Changes the volume of the instance
@@ -303,7 +373,7 @@ var AudioFX = (function () {
       return this;
     }
   }, {
-    key: "changeFilter",
+    key: 'changeFilter',
 
     /**
      * Changes the filter of the instance
@@ -320,12 +390,12 @@ var AudioFX = (function () {
       var multiplier = Math.pow(2, numberOfOctaves * (frequency - 1));
       // Get back to the frequency value between min and max.
       this.filterNode.frequency.value = maxValue * multiplier;
-      this.filterNode.Q.value = quality * this["const"].QUALITY_MULTIPLIER;
+      this.filterNode.Q.value = quality * this['const'].QUALITY_MULTIPLIER;
       // return for chaining
       return this;
     }
   }, {
-    key: "getCurrentTime",
+    key: 'getCurrentTime',
 
     /**
      * Gets the current playhead of the AudioFX instance
@@ -339,7 +409,7 @@ var AudioFX = (function () {
       }
     }
   }, {
-    key: "getDuration",
+    key: 'getDuration',
 
     /**
      * Gets the duration of the AudioFX instance
@@ -349,15 +419,19 @@ var AudioFX = (function () {
       return this.duration;
     }
   }, {
-    key: "destroy",
+    key: 'destroy',
 
     /**
      * Destroys the instance, make sure to clean all reference to it for Garbage Collection
      */
     value: function destroy() {
+      // stop if we're playing
       if (this.playing) {
         this.stop();
       }
+      // kill reference in cache
+      window.AudioFXGlobal.cache.splice(window.AudioFXGlobal.cache.indexOf(this), 1);
+      // memory cleanup
       for (var prop in this) {
         if (this.hasOwnProperty(prop)) {
           delete this[prop];
@@ -365,7 +439,7 @@ var AudioFX = (function () {
       }
     }
   }, {
-    key: "volume",
+    key: 'volume',
 
     // SYNTACTIC SUGAR
 
@@ -376,7 +450,7 @@ var AudioFX = (function () {
       return this.changeVolume(v);
     }
   }, {
-    key: "filter",
+    key: 'filter',
 
     /**
      * Just syntactic sugar over changeFilter
@@ -385,7 +459,7 @@ var AudioFX = (function () {
       return this.changeFilter(f, q);
     }
   }, {
-    key: "kill",
+    key: 'kill',
 
     /**
      * Just syntactic sugar over destroy
@@ -394,7 +468,7 @@ var AudioFX = (function () {
       return this.destroy();
     }
   }, {
-    key: "remove",
+    key: 'remove',
 
     /**
      * Just syntactic sugar over destroy
@@ -403,7 +477,17 @@ var AudioFX = (function () {
       return this.destroy();
     }
   }], [{
-    key: "extend",
+    key: 'destroyAll',
+
+    // GLOBAL FUNCTIONS
+
+    value: function destroyAll() {
+      window.AudioFXGlobal.cache.forEach(function (instance) {
+        instance.destroy();
+      });
+    }
+  }, {
+    key: 'extend',
 
     // HELPER FUNCTIONS FOR INDEPENDENCE
 
@@ -421,17 +505,34 @@ var AudioFX = (function () {
       return a;
     }
   }, {
-    key: "isObject",
+    key: 'clone',
+
+    /**
+     * Clones a AudioBuffer
+     * @param inBuffer - the buffer to clone
+     * @returns {object} - the cloned buffer
+     */
+    value: function clone(inBuffer) {
+      var outBuffer = window.AudioFXGlobal.context.createBuffer(inBuffer.numberOfChannels, inBuffer.length, inBuffer.sampleRate);
+      for (var i = 0, c = inBuffer.numberOfChannels; i < c; ++i) {
+        var od = outBuffer.getChannelData(i),
+            id = inBuffer.getChannelData(i);
+        od.set(id, 0);
+      }
+      return outBuffer;
+    }
+  }, {
+    key: 'isObject',
 
     /**
      * Checks if the supplied argument is an object and not null
      * @param {object} obj - the argument to check
      */
     value: function isObject(obj) {
-      return obj !== null && typeof obj === "object";
+      return obj !== null && typeof obj === 'object';
     }
   }, {
-    key: "isFunction",
+    key: 'isFunction',
 
     /**
      * Checks if the supplied argument is a function
@@ -439,17 +540,17 @@ var AudioFX = (function () {
      */
     value: function isFunction(functionToCheck) {
       var getType = {};
-      return functionToCheck && getType.toString.call(functionToCheck) === "[object Function]";
+      return functionToCheck && getType.toString.call(functionToCheck) === '[object Function]';
     }
   }, {
-    key: "error",
+    key: 'error',
 
     /**
      * Centralized error handling
      * @param {string} errorMessage - the message for output
      */
     value: function error(errorMessage) {
-      throw new Error("AudioFX: Error! " + errorMessage);
+      throw new Error('AudioFX: Error! ' + errorMessage);
     }
   }]);
 

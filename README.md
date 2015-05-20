@@ -4,6 +4,8 @@ High-Level Audio Effects using the Web Audio API in JavaScript, ~1-2 KB gzipped.
 
 Currently only a lowpass-filter is available and things are still very **alpha**. API **will probably** change in the future. Currently 93% test coverage in latest Chrome, FF and Safari.
 
+Features caching, so repeated loadings to the same url result in only one request and deep copies of the cached AudioBuffers for the following loads.
+
 [Demo](http://madebywild.github.io/audioFX/)
 
 ## Installation
@@ -35,6 +37,7 @@ Creates a new AudioFX instance that represents one loaded Audio file. If you sto
 #### options
 
 - ``loop`` {boolean} - If the audio file should loop upon playing (Default: false)
+- ``volume`` {float} - A fraction between 0 and 1, representing the starting volume of the instance
 - ``filterFrequency`` {float} - A fraction between 0 and 1, representing the set filter frequency from start. If ``null`` is specified, the filter is set to the samplerate and therefore not hearable (Default: null)
 - ``autoplay`` {boolean} - If set to true (Default: false)
 
@@ -44,6 +47,7 @@ var TestAudio = new AudioFX("test.mp3", function(){
     // do something
 }, {
     loop: true,
+    volume: 0.85,
     filterFrequency: 0.5,
     autoplay: true
 });

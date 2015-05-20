@@ -17,8 +17,13 @@ class AudioFX {
     };
     // set defaultOptions
     let defaultOptions = {
+      // if the audio should loop
       loop: false,
+      // starting volume
+      volume: 1,
+      // the frequency of the filter, null means no filter
       filterFrequency: null,
+      // if it should play immediately after loading
       autoplay: false
     };
     // overwrite defaults with supplied options – if an object is supplied
@@ -34,6 +39,8 @@ class AudioFX {
     if(!window.AudioFXGlobal) {
       // first allocate and then fill
       window.AudioFXGlobal = {};
+      // init empty cache
+      window.AudioFXGlobal.cache = [];
       // init context with prefixes
       try {
         window.AudioContext = window.AudioContext||window.webkitAudioContext;
@@ -69,6 +76,8 @@ class AudioFX {
     }
     // create gain node
     this.gainNode = window.AudioFXGlobal.context.createGain();
+    // set the option volume
+    this.gainNode.gain.value = this.options.volume;
     // create filter node
     this.filterNode = window.AudioFXGlobal.context.createBiquadFilter();
     // filter.type is defined as string type in the latest API. But this is defined as number type in old API.
@@ -81,8 +90,22 @@ class AudioFX {
     }
     // set the pauseTime to 0, so we can add to it
     this._pauseTime = 0;
-    // if there's directly a url provided, the load it
-    this.loadFile(url);
+    // set unique id
+    this.id = window.AudioFXGlobal.cache.length + 1;
+    // if there's directly a url provided and it's not in the cache, then load it
+    let cached = window.AudioFXGlobal.cache.find(function(item){
+      return item.url === url;
+    });
+    // check if a cached version of that url has been found
+    if(window.AudioFXGlobal.cache.length > 0 && cached){
+      // if so, manually set that it's loaded
+      this.hasLoaded = true;
+      // and make a deep copy of the buffer
+      this.setBuffer(cached.buffer);
+    }else{
+      // nothing found in the cache, so we issue a XHR request
+      this.loadFile(url);
+    }
     // no return needed for constructor
   }
 
@@ -107,24 +130,7 @@ class AudioFX {
         instance.request.response,
         // do this with it
         function(buffer) {
-          // if we don't have a buffer, throw an error
-          if (!buffer) {
-            AudioFX.error('Error decoding file data: ' + url);
-          }
-          // otherwise save the buffer
-          instance.buffer = buffer;
-          // save the duration information to the instance
-          instance.duration = parseFloat(buffer.duration);
-          // set hasLoaded
-          instance.hasLoaded = true;
-          // autoplay if set
-          if(instance.options.autoplay === true){
-            instance.play();
-          }
-          // and fire the callback if we have one
-          if(AudioFX.isFunction(instance.onload)) {
-            instance.onload(instance);
-          }
+          instance.setBuffer(buffer);
         },
         // if you can't make it, tell me why
         function(error) {
@@ -138,6 +144,36 @@ class AudioFX {
     };
     // actually send the request we created
     this.request.send();
+  }
+
+  /**
+   * After decoding a buffer or loading an already decoded buffer, set it to the instance
+   * @param buffer - a decoded AudioBuffer
+   * @returns {AudioFX} - Return the current instance for chaining
+   */
+  setBuffer(buffer){
+    // if we don't have a buffer, throw an error
+    if (!buffer) {
+      AudioFX.error('No Buffer found.');
+    }
+    // save the url to the cache
+    window.AudioFXGlobal.cache.push(this);
+    // otherwise save the buffer
+    this.buffer = AudioFX.clone(buffer);
+    //this.buffer = buffer;
+    // save the duration information to the instance
+    this.duration = parseFloat(buffer.duration);
+    // set hasLoaded
+    this.hasLoaded = true;
+    // autoplay if set
+    if(this.options.autoplay === true){
+      this.play();
+    }
+    // and fire the callback if we have one
+    if(AudioFX.isFunction(this.onload)) {
+      this.onload(this);
+    }
+    return this;
   }
 
   /**
@@ -158,7 +194,6 @@ class AudioFX {
 
   /**
    * Plays the Audio
-   * @param {number} when - The when parameter defines when the play will start. If when represents a time in the past, the play will start immediately.
    * @param {number} offset - The offset parameter describes the offset time in the buffer (in seconds) where playback will begin. If 0 is passed in for this value, then playback will start from the beginning of the buffer.
    */
   play(offset = 0){
@@ -312,9 +347,13 @@ class AudioFX {
    * Destroys the instance, make sure to clean all reference to it for Garbage Collection
    */
   destroy(){
+    // stop if we're playing
     if(this.playing) {
       this.stop();
     }
+    // kill reference in cache
+    window.AudioFXGlobal.cache.splice(window.AudioFXGlobal.cache.indexOf(this), 1);
+    // memory cleanup
     for(var prop in this){
       if(this.hasOwnProperty(prop)){
         delete this[prop];
@@ -352,6 +391,14 @@ class AudioFX {
     return this.destroy();
   }
 
+  // GLOBAL FUNCTIONS
+
+  static destroyAll(){
+    window.AudioFXGlobal.cache.forEach(function(instance){
+      instance.destroy();
+    });
+  }
+
   // HELPER FUNCTIONS FOR INDEPENDENCE
 
   /**
@@ -366,6 +413,25 @@ class AudioFX {
       }
     }
     return a;
+  }
+
+  /**
+   * Clones a AudioBuffer
+   * @param inBuffer - the buffer to clone
+   * @returns {object} - the cloned buffer
+   */
+  static clone(inBuffer) {
+    let outBuffer = window.AudioFXGlobal.context.createBuffer(
+      inBuffer.numberOfChannels,
+      inBuffer.length,
+      inBuffer.sampleRate
+    );
+    for (var i = 0, c = inBuffer.numberOfChannels; i < c; ++i) {
+      let od = outBuffer.getChannelData(i),
+        id = inBuffer.getChannelData(i);
+      od.set(id, 0);
+    }
+    return outBuffer;
   }
 
   /**
