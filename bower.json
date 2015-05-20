@@ -1,6 +1,6 @@
 {
   "name": "AudioFX",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "High-Level Audio Effects using the Web Audio API in JavaScript.",
   "homepage": "https://github.com/madebywild/audioFX",
   "authors": [

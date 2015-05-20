@@ -206,6 +206,23 @@ describe("When an instance is created", function() {
     expect(init).not.toThrow();
   });
 
+  it("changeVolumeAll and destroyAll is working", function (done) {
+    var init = function () {
+      new AudioFX(testAudioUrl, function () {
+        this.play();
+        AudioFXGlobal.changeVolumeAll(0.5);
+        expect(this.gainNode.gain.value).toBe(0.25);
+        AudioFXGlobal.destroyAll();
+        expect(this.playing).toBe(undefined);
+        done();
+      }, {
+        loop: true
+      });
+    };
+    init();
+    expect(init).not.toThrow();
+  });
+
   it("it doesn't work without a supplied url", function () {
     var AudioTest;
     var init = function () {

@@ -8,6 +8,7 @@ var uglify = require('gulp-uglify');
 var rename = require("gulp-rename");
 var umd = require("gulp-umd");
 var karma = require('karma').server;
+var bump = require("gulp-bump");
 
 var paths = {
   scriptSrc: "src/**/*.js"
@@ -39,4 +40,13 @@ gulp.task('test', function (done) {
     configFile: __dirname + '/karma.conf.js',
     singleRun: true
   }, done);
+});
+
+/**
+ * Bump new version
+ */
+gulp.task('bump', function(){
+  gulp.src(['./bower.json', './package.json'])
+    .pipe(bump({type:'major'}))
+    .pipe(gulp.dest('./'));
 });
