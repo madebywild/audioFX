@@ -178,6 +178,25 @@ var TestAudio = new AudioFX("test.mp3", function(){
 });
 ```
 
+## AudioFXGlobal
+
+If you want to use multiple AudioFX instances, there is a global ``AudioFXGlobal`` object that is created by the first ``AudioFX`` instance. This object holds the ``cache`` as an Array of instances and provides a couple of convenient methods:
+
+### changeVolumeAll(volume)
+
+- ``volume`` {number} - the new volume to set (supply a fraction like 0.5 between 0 and 1)
+
+Changes the volume on **all** instances. Be aware that there obviously is no fine-grained control over which instances are affected. Useful if all have the same volume anyway and you want to quickly mute/unmute the website or have a global volume slider. 
+
+### destroyAll()
+
+Stops and destroys all ``AudioFX`` instances, be sure to ``null`` the variable/references to completely get rid of them in the memory.
+
+Example:
+```javascript
+AudioFXGlobal.destroyAll();
+```
+
 ## Dependencies
 
 **None!** Drop it in as you please.
@@ -200,9 +219,9 @@ This is the list of browsers that support the Web Audio API, that means it shoul
 - [ ] Reverb (Convolver)
 - [ ] Delay
 - [ ] AnalyzerNode
-- [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 - [ ] Fade In / Fade Out (non-linear)
 - [ ] panning position with panner.setPosition(x, y, z);
+- [ ] HTML5 Audio Player fallback so there is progressive enhancement (sound playing, but no FX)
 
 ## License
 

@@ -1,5 +1,5 @@
 "use strict";
-/*global window,AudioContext,XMLHttpRequest */
+/*global window,AudioFXGlobal,AudioContext,XMLHttpRequest */
 
 class AudioFX {
 
@@ -37,17 +37,7 @@ class AudioFX {
     this.hasLoaded = false;
     // init global audioFX if hasn't been already
     if(!window.AudioFXGlobal) {
-      // first allocate and then fill
-      window.AudioFXGlobal = {};
-      // init empty cache
-      window.AudioFXGlobal.cache = [];
-      // init context with prefixes
-      try {
-        window.AudioContext = window.AudioContext||window.webkitAudioContext;
-        window.AudioFXGlobal.context = new AudioContext();
-      }catch(e) {
-        AudioFX.error('Web Audio API Error: '+e.message);
-      }
+      window.AudioFXGlobal = new AudioFXGlobalClass();
     }
     // register the supplied url, I'd say there's no valid-URL-check necessary
     if(typeof url !== "string"){
@@ -70,10 +60,6 @@ class AudioFX {
     this.duration = 0;
     // create empty buffer source var
     this.source = null;
-    // normalize browser syntax
-    if (!window.AudioFXGlobal.context.createGain) {
-      window.AudioFXGlobal.context.createGain = window.AudioFXGlobal.context.createGainNode;
-    }
     // create gain node
     this.gainNode = window.AudioFXGlobal.context.createGain();
     // set the option volume
@@ -389,14 +375,6 @@ class AudioFX {
    */
   remove(){
     return this.destroy();
-  }
-
-  // GLOBAL FUNCTIONS
-
-  static destroyAll(){
-    window.AudioFXGlobal.cache.forEach(function(instance){
-      instance.destroy();
-    });
   }
 
   // HELPER FUNCTIONS FOR INDEPENDENCE

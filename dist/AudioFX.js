@@ -13,6 +13,66 @@ var _createClass = (function () { function defineProperties(target, props) { for
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
+/*global window,AudioFX,AudioContext,XMLHttpRequest */
+
+var AudioFXGlobalClass = (function () {
+
+  /**
+   * Initializes the Global AudioFX object, is fired when the first AudioFX instance is created
+   */
+
+  function AudioFXGlobalClass() {
+    _classCallCheck(this, AudioFXGlobalClass);
+
+    // init empty cache
+    this.cache = [];
+    // init context with prefixes
+    try {
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      this.context = new AudioContext();
+    } catch (e) {
+      AudioFX.error('Web Audio API Error: ' + e.message);
+    }
+    // normalize browser syntax
+    if (!this.context.createGain) {
+      this.context.createGain = this.context.createGainNode;
+    }
+  }
+
+  _createClass(AudioFXGlobalClass, [{
+    key: 'changeVolumeAll',
+
+    /**
+     * Changes the volume on **all** instances. Be aware that there obviously is no fine-grained control over which instances are affected. Useful if all have the same volume anyway and you want to quickly mute/unmute the website or have a global volume slider.
+     * @param {number} volume - the volume (supply a fraction like 0.5 between 0 and 1)
+     */
+    value: function changeVolumeAll(volume) {
+      // loop through all instances
+      this.cache.forEach(function (instance) {
+        // and call their destroy functions
+        instance.volume(volume);
+      });
+      return this;
+    }
+  }, {
+    key: 'destroyAll',
+
+    /**
+     * Destroys all AudioFX instances
+     */
+    value: function destroyAll() {
+      // loop through all instances
+      this.cache.forEach(function (instance) {
+        // and call their destroy functions
+        instance.destroy();
+      });
+      return this;
+    }
+  }]);
+
+  return AudioFXGlobalClass;
+})();
+
 (function () {
 
   if (Array.prototype.find) return;
@@ -46,7 +106,7 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 })();
 
 'use strict';
-/*global window,AudioContext,XMLHttpRequest */
+/*global window,AudioFXGlobal,AudioContext,XMLHttpRequest */
 
 var AudioFX = (function () {
 
@@ -87,17 +147,7 @@ var AudioFX = (function () {
     this.hasLoaded = false;
     // init global audioFX if hasn't been already
     if (!window.AudioFXGlobal) {
-      // first allocate and then fill
-      window.AudioFXGlobal = {};
-      // init empty cache
-      window.AudioFXGlobal.cache = [];
-      // init context with prefixes
-      try {
-        window.AudioContext = window.AudioContext || window.webkitAudioContext;
-        window.AudioFXGlobal.context = new AudioContext();
-      } catch (e) {
-        AudioFX.error('Web Audio API Error: ' + e.message);
-      }
+      window.AudioFXGlobal = new AudioFXGlobalClass();
     }
     // register the supplied url, I'd say there's no valid-URL-check necessary
     if (typeof url !== 'string') {
@@ -120,10 +170,6 @@ var AudioFX = (function () {
     this.duration = 0;
     // create empty buffer source var
     this.source = null;
-    // normalize browser syntax
-    if (!window.AudioFXGlobal.context.createGain) {
-      window.AudioFXGlobal.context.createGain = window.AudioFXGlobal.context.createGainNode;
-    }
     // create gain node
     this.gainNode = window.AudioFXGlobal.context.createGain();
     // set the option volume
@@ -477,16 +523,6 @@ var AudioFX = (function () {
       return this.destroy();
     }
   }], [{
-    key: 'destroyAll',
-
-    // GLOBAL FUNCTIONS
-
-    value: function destroyAll() {
-      window.AudioFXGlobal.cache.forEach(function (instance) {
-        instance.destroy();
-      });
-    }
-  }, {
     key: 'extend',
 
     // HELPER FUNCTIONS FOR INDEPENDENCE
