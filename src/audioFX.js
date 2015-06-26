@@ -24,7 +24,9 @@ class AudioFX {
       // the frequency of the filter, null means no filter
       filterFrequency: null,
       // if it should play immediately after loading
-      autoplay: false
+      autoplay: false,
+      // function to be called when the buffersource has naturally ended
+      onEnded: null
     };
     // overwrite defaults with supplied options – if an object is supplied
     if(AudioFX.isObject(options)) {
@@ -168,6 +170,9 @@ class AudioFX {
   bufferEnded(){
     // set playing to false
     this.playing = false;
+    if(this.options.onEnded !== null){
+      this.options.onEnded();
+    }
   }
 
   /**
