@@ -284,10 +284,14 @@ var AudioFX = (function () {
      * The ended event is fired when playback has stopped because the end of the media was reached.
      */
     value: function bufferEnded() {
-      // set playing to false
-      this.playing = false;
-      if (this.options.onEnded !== null) {
-        this.options.onEnded();
+      // only if it has ended naturally, then reset pauseTime
+      if (!this.endByStop) {
+        this._pauseTime = null;
+        // set playing to false
+        this.playing = false;
+        if (this.options.onEnded !== null) {
+          this.options.onEnded.apply(this);
+        }
       }
     }
   }, {
@@ -368,7 +372,9 @@ var AudioFX = (function () {
           this.source.stop = this.source.noteOff;
         }
         // now stop
+        this.endByStop = true;
         this.source.stop();
+        this.endByStop = false;
         // we're not playing anymore
         this.playing = false;
       }
@@ -391,7 +397,10 @@ var AudioFX = (function () {
       // reset the paused time because we're at 0 again
       this._pauseTime = null;
       // now actually do it
+      this.endByStop = true;
       this.source.stop(when);
+      this.endByStop = false;
+      // we're not playing anymore
       this.playing = false;
       // return for chaining
       return this;

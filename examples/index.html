@@ -17,7 +17,7 @@
 <body>
 <script src="../dist/AudioFX.js"></script>
 <script>
-  var TestAudio = new AudioFX("test.mp3", function(){
+  var TestAudio = new AudioFX("test2.wav", function(){
     document.addEventListener('mousemove', function(e){
       var f = e.pageX / window.innerWidth;
       var q = e.pageY / window.innerHeight;
@@ -27,9 +27,13 @@
       TestAudio.toggle();
     });
   }, {
-    loop:true,
+//    loop:true,
     autoplay:true,
-    volume:0.3
+    volume:0.3,
+    onEnded: function(){
+      console.log(this);
+      console.log(this.getCurrentTime());
+    }
   });
 </script>
 </body>
