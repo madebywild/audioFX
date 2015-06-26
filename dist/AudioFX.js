@@ -106,7 +106,7 @@ var AudioFXGlobalClass = (function () {
 })();
 
 'use strict';
-/*global window,AudioFXGlobal,AudioContext,XMLHttpRequest */
+/*global window,AudioFXGlobal,AudioContext,XMLHttpRequest,AudioFXGlobalClass */
 
 var AudioFX = (function () {
 
@@ -276,6 +276,16 @@ var AudioFX = (function () {
       return this;
     }
   }, {
+    key: 'bufferEnded',
+
+    /**
+     * The ended event is fired when playback has stopped because the end of the media was reached.
+     */
+    value: function bufferEnded() {
+      // set playing to false
+      this.playing = false;
+    }
+  }, {
     key: 'createAndConnectNodes',
 
     /**
@@ -286,6 +296,8 @@ var AudioFX = (function () {
       this.source = window.AudioFXGlobal.context.createBufferSource();
       // assign buffer to source
       this.source.buffer = this.buffer;
+      // hook up the ended event
+      this.source.onended = this.bufferEnded.bind(this);
       // connect source to filter
       this.source.connect(this.filterNode);
       // connect filter to gain
