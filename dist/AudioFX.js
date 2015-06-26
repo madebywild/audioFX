@@ -285,7 +285,7 @@ var AudioFX = (function () {
      */
     value: function bufferEnded() {
       // only if it has ended naturally, then reset pauseTime
-      if (!this.endByStop) {
+      if (this.endByStop !== true) {
         this._pauseTime = null;
         // set playing to false
         this.playing = false;
@@ -324,6 +324,8 @@ var AudioFX = (function () {
     value: function play() {
       var offset = arguments[0] === undefined ? 0 : arguments[0];
 
+      // reset endByStop var
+      this.endByStop = false;
       // if we were playing already, stop the previous instance, otherwise we can't control it anymore
       if (this.playing === true) {
         this.stop();
@@ -374,7 +376,6 @@ var AudioFX = (function () {
         // now stop
         this.endByStop = true;
         this.source.stop();
-        this.endByStop = false;
         // we're not playing anymore
         this.playing = false;
       }
@@ -399,7 +400,6 @@ var AudioFX = (function () {
       // now actually do it
       this.endByStop = true;
       this.source.stop(when);
-      this.endByStop = false;
       // we're not playing anymore
       this.playing = false;
       // return for chaining

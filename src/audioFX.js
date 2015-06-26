@@ -169,7 +169,7 @@ class AudioFX {
    */
   bufferEnded(){
     // only if it has ended naturally, then reset pauseTime
-    if(!this.endByStop){
+    if(this.endByStop !== true){
       this._pauseTime = null;
       // set playing to false
       this.playing = false;
@@ -202,6 +202,8 @@ class AudioFX {
    * @param {number} offset - The offset parameter describes the offset time in the buffer (in seconds) where playback will begin. If 0 is passed in for this value, then playback will start from the beginning of the buffer.
    */
   play(offset = 0){
+    // reset endByStop var
+    this.endByStop = false;
     // if we were playing already, stop the previous instance, otherwise we can't control it anymore
     if(this.playing === true){
       this.stop();
@@ -250,7 +252,6 @@ class AudioFX {
       // now stop
       this.endByStop = true;
       this.source.stop();
-      this.endByStop = false;
       // we're not playing anymore
       this.playing = false;
     }
@@ -271,7 +272,6 @@ class AudioFX {
     // now actually do it
     this.endByStop = true;
     this.source.stop(when);
-    this.endByStop = false;
     // we're not playing anymore
     this.playing = false;
     // return for chaining
