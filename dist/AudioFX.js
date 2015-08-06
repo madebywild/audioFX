@@ -182,7 +182,7 @@ var AudioFX = (function () {
     this.filterNode.type = typeof this.filterNode.type === 'string' ? 'lowpass' : 0; // LOWPASS
     // if a filter frequency was set in the options, use it, otherwise fall back to the sampleRate, which is the maximum
     if (this.options.filterFrequency) {
-      this.filterNode.frequency.value = this.options.filterFrequency;
+      this.changeFilter(this.options.filterFrequency, 0.5);
     } else {
       this.filterNode.frequency.value = window.AudioFXGlobal.context.sampleRate;
     }

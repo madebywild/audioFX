@@ -27,8 +27,9 @@
       TestAudio.toggle();
     });
   }, {
-//    loop:true,
+    loop:true,
     autoplay:true,
+    filterFrequency: 0.25,
     volume:0.3,
     onEnded: function(){
       console.log(this);
