@@ -12,7 +12,7 @@ Features caching, so repeated loadings to the same url result in only one reques
 
 ### CDN
 
-``<script src="//cdn.jsdelivr.net/audiofx/latest/AudioFX.min.js"></script>``
+``<script src="//cdn.jsdelivr.net/npm/audiofx@latest/dist/AudioFX.min.js"></script>``
 
 ### Bower
 
